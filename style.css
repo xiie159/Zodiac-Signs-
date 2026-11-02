@@ -397,6 +397,22 @@ button {
 .finder-form .button {
   width:100%
 }
+.data-consent {
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  margin:0 0 20px;
+  color:#cbd1d9;
+  font-size:12px;
+  line-height:1.7
+}
+.data-consent input {
+  flex:none;
+  width:16px;
+  height:16px;
+  margin:2px 0 0;
+  accent-color:var(--gold)
+}
 .form-message {
   font-size:11px;
   color:#9ca8b9;

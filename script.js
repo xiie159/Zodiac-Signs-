@@ -80,6 +80,26 @@ const 日期欄 = document.querySelector('#birth-date');
 const 時間欄 = document.querySelector('#birth-time');
 const 地點欄 = document.querySelector('#birth-place');
 const 提示 = document.querySelector('#form-message');
+const 專案網址 = 'https://wzsrftocylzqdvlotlso.supabase.co';
+const 公開金鑰 = 'sb_publishable_B_v0cv3l92BXEaPUeU-L4Q_KENpBdk4';
+
+// 只把問卷的三個欄位送到資料庫；公開金鑰必須搭配資料表權限使用。
+async function 儲存問卷() {
+  const 回應 = await fetch(`${專案網址}/rest/v1/birth_submissions`, {
+    method:'POST',
+    headers:{
+      'apikey':公開金鑰,
+      'Content-Type':'application/json',
+      'Prefer':'return=minimal'
+    },
+    body:JSON.stringify({
+      birth_date:日期欄.value,
+      birth_time:時間欄.value,
+      birth_place:地點欄.value
+    })
+  });
+  if (!回應.ok) throw new Error('問卷儲存失敗');
+}
 
 // 依臺灣歷史時區資料，換算出生當日與世界標準時間的時差。
 function 取得臺灣時差(年, 月, 日, 時, 分) {
@@ -456,7 +476,13 @@ document.querySelector('#birthday-form').addEventListener('submit', async 事件
       項目.宮位 = 項目.名稱 === '上升' ? 1 : 項目.名稱 === '天頂' ? 10 : 找到宮位(項目.經度, 分界);
     });
     畫星盤(位置清單, 分界, `${日期欄.value} ${時間欄.value}・${地點.名稱}`);
-    提示.textContent = '星盤已產生。調整資料後可再次計算。';
+    提示.textContent = '星盤已產生，正在儲存問卷…';
+    try {
+      await 儲存問卷();
+      提示.textContent = '星盤已產生，問卷已儲存。調整資料後可再次計算。';
+    } catch (錯誤) {
+      提示.textContent = '星盤已產生，但問卷儲存失敗。請確認網路連線後再試一次。';
+    }
   } catch (錯誤) {
     提示.textContent = '星盤計算暫時無法完成。請確認網路連線後再試一次。';
   } finally {
